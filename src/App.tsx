@@ -1,17 +1,14 @@
-import React from "react"
-import "./App.css"
-import styled from "styled-components"
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  background-color: red;
-`
+import React from 'react'
+import './App.css'
+import { AuthProvider } from './contexts/AuthContext'
+import { Main } from './components/Main'
 
 function App() {
   return (
     <div className="App">
-      <Container />
+      <AuthProvider>
+        <Main />
+      </AuthProvider>
     </div>
   )
 }
