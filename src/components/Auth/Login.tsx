@@ -4,6 +4,11 @@ import styled from 'styled-components'
 import { BigFoot } from './BigFoot'
 
 const Container = styled.div`
+  width: 100%;
+  height: 100%;
+`
+
+const Form = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -214,6 +219,143 @@ const ErrorContent = styled.div`
   margin-bottom: 5%;
 `
 
+const LoadingDiv = styled.div`
+  width: 100vw;
+  height: 100vh;
+  z-index: 99;
+  background-color: transparent;
+  position: absolute;
+`
+
+const Box = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  margin-top: 30vh;
+  :before,
+  :after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  @keyframes rotating {
+    from {
+      transform: rotate(720deg);
+    }
+    to {
+      transform: none;
+    }
+  }
+`
+
+const Cat = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 20em;
+  overflow: hidden;
+  background-color: transparent;
+  :before {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+  }
+  :hover {
+    animation-play-state: paused;
+  }
+  :active {
+    animation-play-state: running;
+  }
+`
+
+const CatHead = styled.div<{
+  style: {
+    url: string
+  }
+}>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
+  :before {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background-size: 200%;
+    background-image: url(${(props) => props.style.url});
+    background-repeat: no-repeat;
+    top: 0;
+    right: 0;
+    background-position: 100% 0%;
+    transform-origin: 0% 100%;
+    transform: rotate(90deg);
+  }
+`
+
+const CatTail = styled.div<{
+  style: {
+    url: string
+  }
+}>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
+  animation-delay: 0.2s;
+  :before {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    background-size: 200%;
+    background-image: url(${(props) => props.style.url});
+    background-repeat: no-repeat;
+    left: 0;
+    bottom: 0;
+    background-position: 0% 100%;
+    transform-origin: 100% 0%;
+    transform: rotate(-30deg);
+  }
+`
+
+const CatBody = styled.div<{
+  style: {
+    url: string
+  }
+}>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  background-size: 200%;
+  background-repeat: no-repeat;
+  animation-delay: 0.1s;
+  :nth-of-type(2) {
+    animation-delay: 0.2s;
+  }
+  :before {
+    right: 0;
+    bottom: 0;
+    background-position: 100% 100%;
+    transform-origin: 0% 0%;
+    background-image: url(${(props) => props.style.url});
+  }
+`
+
 export const Login: React.FC = () => {
   React.useEffect(() => {
     const scriptTween = document.createElement('script')
@@ -233,94 +375,136 @@ export const Login: React.FC = () => {
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
   const [error, setError] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
   const [hiddenError, setHiddenError] = React.useState(true)
+  const [isShowPassword, setShowPassword] = React.useState(false)
 
   const { onLogin } = useAuth()
 
   const handleLogin = async () => {
-    try {
-      if (username.trim() && password.trim()) {
-        await onLogin(username, password)
-      } else {
-        setError('Enter your info')
-        setHiddenError(false)
-      }
-    } catch (e) {
-      setError('Incorrect!!!')
+    if (!username.trim() || !password.trim()) {
+      setLoading(false)
+      setError('Enter your info')
       setHiddenError(false)
+    } else {
+      setHiddenError(true)
+      setLoading(true)
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+      try {
+        await onLogin(username, password)
+      } catch (e) {
+        setError('Incorrect!!!')
+        setLoading(false)
+        setHiddenError(false)
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+        setHiddenError(true)
+      }
     }
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    setHiddenError(true)
+  }
+
+  const toggleShowPassword = async () => {
+    setShowPassword(!isShowPassword)
+    setError('Aha i know pass')
+    setHiddenError(false)
+    if (isShowPassword) {
+      setHiddenError(true)
+    }
   }
 
   return (
     <Container>
-      <ErrorDiv style={{ visibility: hiddenError ? 'hidden' : 'visible' }}>
-        <ErrorContent>{error}</ErrorContent>
-      </ErrorDiv>
-      <SvgContainer className="svgContainer">
-        <SvgContainerDiv>
-          <BigFoot />
-        </SvgContainerDiv>
-      </SvgContainer>
-      <InputGroup className="inputGroup1">
-        <Label htmlFor="loginUsername" id="loginUsernameLabel">
-          Username
-        </Label>
-        <Input
-          onChange={(e) => {
-            setUsername(e.target.value)
-          }}
-          type="text"
-          id="loginUsername"
-          maxLength={254}
-        />
-        <Helper className="helper">Username</Helper>
-      </InputGroup>
-      <InputGroup className="inputGroup2">
-        <Label htmlFor="loginPassword" id="loginPasswordLabel">
-          Password
-        </Label>
-        <Input
-          onChange={(e) => {
-            setPassword(e.target.value)
-          }}
-          style={{
-            padding: '0.4em 1em 0.5em',
-          }}
-          type="password"
-          id="loginPassword"
-        />
-        <Label
-          style={{
-            display: 'block',
-            padding: ' 0 0 0 1.45em',
-            position: 'absolute',
-            top: '0.25em',
-            right: 0,
-            fontSize: '1em',
-          }}
-          id="showPasswordToggle"
-          htmlFor="showPasswordCheck"
-        >
-          <span style={{ position: 'absolute', top: '-5px', left: '-17px' }}>
-            Show
-          </span>
+      <LoadingDiv style={{ visibility: loading ? 'visible' : 'hidden' }}>
+        <Box>
+          <Cat>
+            <CatBody
+              style={{ url: `${window.location.origin}/images/loading.png` }}
+            />
+            <CatBody
+              style={{ url: `${window.location.origin}/images/loading.png` }}
+            />
+            <CatHead
+              style={{ url: `${window.location.origin}/images/loading.png` }}
+            />
+            <CatTail
+              style={{ url: `${window.location.origin}/images/loading.png` }}
+            />
+          </Cat>
+        </Box>
+      </LoadingDiv>
+      <Form style={{ visibility: loading ? 'hidden' : 'visible' }}>
+        <ErrorDiv style={{ visibility: hiddenError ? 'hidden' : 'visible' }}>
+          <ErrorContent>{error}</ErrorContent>
+        </ErrorDiv>
+        <SvgContainer className="svgContainer">
+          <SvgContainerDiv>
+            <BigFoot />
+          </SvgContainerDiv>
+        </SvgContainer>
+        <InputGroup className="inputGroup1">
+          <Label htmlFor="loginUsername" id="loginUsernameLabel">
+            Username
+          </Label>
           <Input
-            style={{
-              position: 'absolute',
-              zIndex: -1,
-              opacity: 0,
+            onChange={(e) => {
+              setUsername(e.target.value)
             }}
-            id="showPasswordCheck"
-            type="checkbox"
+            type="text"
+            id="loginUsername"
+            maxLength={254}
           />
-          <Indicator className="indicator" />
-        </Label>
-      </InputGroup>
-      <InputGroup className="inputGroup3">
-        <Button onClick={handleLogin}>Login</Button>
-      </InputGroup>
+          <Helper className="helper">Username</Helper>
+        </InputGroup>
+        <InputGroup className="inputGroup2">
+          <Label htmlFor="loginPassword" id="loginPasswordLabel">
+            Password
+          </Label>
+          <Input
+            onChange={(e) => {
+              setPassword(e.target.value)
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleLogin()
+              }
+            }}
+            style={{
+              padding: '0.4em 1em 0.5em',
+            }}
+            type="password"
+            id="loginPassword"
+          />
+          <Label
+            style={{
+              display: 'block',
+              padding: ' 0 0 0 1.45em',
+              position: 'absolute',
+              top: '0.25em',
+              right: 0,
+              fontSize: '1em',
+            }}
+            id="showPasswordToggle"
+            htmlFor="showPasswordCheck"
+          >
+            <span style={{ position: 'absolute', top: '-5px', left: '-17px' }}>
+              Show
+            </span>
+            <Input
+              style={{
+                position: 'absolute',
+                zIndex: -1,
+                opacity: 0,
+              }}
+              id="showPasswordCheck"
+              type="checkbox"
+              onClick={toggleShowPassword}
+            />
+            <Indicator className="indicator" />
+          </Label>
+        </InputGroup>
+        <InputGroup className="inputGroup3">
+          <Button onClick={handleLogin}>Login</Button>
+        </InputGroup>
+      </Form>
     </Container>
   )
 }
