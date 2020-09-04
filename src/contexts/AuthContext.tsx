@@ -16,24 +16,27 @@ type Props = {}
 
 export const AuthProvider: React.FC<Props> = ({ children }) => {
   const [token, setToken] = React.useState<string>()
+
+  React.useEffect(() => {
+    setToken(sessionStorage.getItem('token') || undefined)
+  }, [])
+
   const handleLogin = async (username: string, password: string) => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}auth/login`,
-        {
-          username,
-          password,
-        }
-      )
-      setToken(response.data)
-    } catch {
-      setToken(undefined)
-    }
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}auth/login`,
+      {
+        username,
+        password,
+      }
+    )
+    const token = response.data
+    setToken(token)
+    sessionStorage.setItem('token', token)
   }
 
   const value: AuthContext = {
     onLogin: handleLogin,
-    token: token,
+    token,
   }
 
   return <AuthContext.Provider {...{ value, children }} />
