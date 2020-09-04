@@ -172,6 +172,48 @@ const Indicator = styled.div`
   }
 `
 
+const ErrorDiv = styled.div<{
+  style: {
+    visibility: string
+  }
+}>`
+  width: 40%;
+  margin: 50px auto;
+  background: #ffffff;
+  text-align: center;
+  font-weight: 900;
+  color: #fff;
+  font-family: arial;
+  position: absolute;
+  padding-top: 2.5%;
+  top: -7.5%;
+  border-radius: 0.5em;
+  border: 1px solid #4eb8dd;
+  right: 0;
+  z-index: 99;
+  visibility: ${(props) => props.style.visibility};
+  :before {
+    content: '';
+    width: 0px;
+    height: 0px;
+    position: absolute;
+    border-left: 10px solid #4eb8dd;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #4eb8dd;
+    border-bottom: 10px solid transparent;
+    left: 15px;
+    bottom: -20px;
+  }
+`
+
+const ErrorContent = styled.div`
+  width: 80%;
+  margin: auto;
+  color: red;
+  font-size: 0.8em;
+  margin-bottom: 5%;
+`
+
 export const Login: React.FC = () => {
   React.useEffect(() => {
     const scriptTween = document.createElement('script')
@@ -190,21 +232,32 @@ export const Login: React.FC = () => {
 
   const [username, setUsername] = React.useState('')
   const [password, setPassword] = React.useState('')
+  const [error, setError] = React.useState('')
+  const [hiddenError, setHiddenError] = React.useState(true)
 
   const { onLogin } = useAuth()
 
   const handleLogin = async () => {
-    if (username.trim() && password.trim()) {
-      try {
+    try {
+      if (username.trim() && password.trim()) {
         await onLogin(username, password)
-      } catch (e) {}
-    } else {
-      alert('Please enter your username or password')
+      } else {
+        setError('Enter your info')
+        setHiddenError(false)
+      }
+    } catch (e) {
+      setError('Incorrect!!!')
+      setHiddenError(false)
     }
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    setHiddenError(true)
   }
 
   return (
     <Container>
+      <ErrorDiv style={{ visibility: hiddenError ? 'hidden' : 'visible' }}>
+        <ErrorContent>{error}</ErrorContent>
+      </ErrorDiv>
       <SvgContainer className="svgContainer">
         <SvgContainerDiv>
           <BigFoot />
