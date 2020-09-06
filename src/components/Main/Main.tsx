@@ -4,6 +4,8 @@ import { Login } from '../Auth'
 import { Home } from '../Home'
 import { Navbar } from '../Nav'
 import styled from 'styled-components'
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { Register } from '../Auth/Register'
 const Container = styled.div`
   width: 95%;
   margin: auto;
@@ -18,6 +20,11 @@ export const Main: React.FC = () => {
       <Home />
     </Container>
   ) : (
-    <Login />
+    <Router>
+      <Switch>
+        <Route path="/login" exact component={Login}></Route>
+        <Route path="/signup" component={Register}></Route>
+      </Switch>
+    </Router>
   )
 }
