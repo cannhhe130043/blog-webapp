@@ -2,7 +2,8 @@ import React from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import styled from 'styled-components'
 import { BigFoot } from './BigFoot'
-
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { Register } from './Register'
 const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -356,6 +357,14 @@ const CatBody = styled.div<{
   }
 `
 
+const SignUp = styled.a`
+  color: blue;
+  text-decoration: none;
+  :hover {
+    cursor: pointer;
+  }
+`
+
 export const Login: React.FC = () => {
   React.useEffect(() => {
     const scriptTween = document.createElement('script')
@@ -504,6 +513,7 @@ export const Login: React.FC = () => {
         <InputGroup className="inputGroup3">
           <Button onClick={handleLogin}>Login</Button>
         </InputGroup>
+        <SignUp href="/signup">Sign up</SignUp>
       </Form>
     </Container>
   )
