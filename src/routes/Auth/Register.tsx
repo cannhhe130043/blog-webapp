@@ -1,9 +1,9 @@
 import React from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import styled from 'styled-components'
-import { BigFoot } from './BigFoot'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import { Register } from './Register'
+import { BigFoot } from '../../components/BigFoot'
+import { useHistory } from 'react-router-dom'
+
 const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -357,7 +357,7 @@ const CatBody = styled.div<{
   }
 `
 
-const SignUp = styled.a`
+const Login = styled.a`
   color: blue;
   text-decoration: none;
   :hover {
@@ -365,14 +365,24 @@ const SignUp = styled.a`
   }
 `
 
-export const Login: React.FC = () => {
+export const Register: React.FC = () => {
+  const history = useHistory()
+  const [username, setUsername] = React.useState('')
+  const [password, setPassword] = React.useState('')
+  const [repassword, setRepassword] = React.useState('')
+  const [error, setError] = React.useState('')
+  const [loading, setLoading] = React.useState(false)
+  const [hiddenError, setHiddenError] = React.useState(true)
+  const [isShowPassword, setShowPassword] = React.useState(false)
+  const { onSignup } = useAuth()
+
   React.useEffect(() => {
     const scriptTween = document.createElement('script')
     scriptTween.src = './js/tweenMax.min.js'
     scriptTween.async = false
     document.body.appendChild(scriptTween)
     const script = document.createElement('script')
-    script.src = './js/script.js'
+    script.src = './js/scriptRegister.js'
     script.async = false
     document.body.appendChild(script)
     const scriptMorph = document.createElement('script')
@@ -381,34 +391,24 @@ export const Login: React.FC = () => {
     document.body.appendChild(scriptMorph)
   }, [])
 
-  const [username, setUsername] = React.useState('')
-  const [password, setPassword] = React.useState('')
-  const [error, setError] = React.useState('')
-  const [loading, setLoading] = React.useState(false)
-  const [hiddenError, setHiddenError] = React.useState(true)
-  const [isShowPassword, setShowPassword] = React.useState(false)
-
-  const { onLogin } = useAuth()
-
-  const handleLogin = async () => {
-    if (!username.trim() || !password.trim()) {
-      setLoading(false)
+  const handleSignup = async () => {
+    if (!username.trim() || !password.trim() || !repassword.trim()) {
       setError('Enter your info')
-      setHiddenError(false)
+    } else if (password !== repassword) {
+      setError('Enter duplicate password')
     } else {
-      setHiddenError(true)
-      setLoading(true)
-      await new Promise((resolve) => setTimeout(resolve, 3000))
       try {
-        await onLogin(username, password)
+        setLoading(true)
+        await onSignup(username, password)
+        history.push('/home')
       } catch (e) {
-        setError('Incorrect!!!')
-        setLoading(false)
-        setHiddenError(false)
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        setHiddenError(true)
+        setError('This username is taken')
       }
     }
+    setLoading(false)
+    setHiddenError(false)
+    await new Promise((resolve) => setTimeout(resolve, 3000))
+    setHiddenError(true)
   }
 
   const toggleShowPassword = async () => {
@@ -471,11 +471,6 @@ export const Login: React.FC = () => {
             onChange={(e) => {
               setPassword(e.target.value)
             }}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleLogin()
-              }
-            }}
             style={{
               padding: '0.4em 1em 0.5em',
             }}
@@ -510,10 +505,30 @@ export const Login: React.FC = () => {
             <Indicator className="indicator" />
           </Label>
         </InputGroup>
-        <InputGroup className="inputGroup3">
-          <Button onClick={handleLogin}>Login</Button>
+        <InputGroup className="inputGroup2">
+          <Label htmlFor="loginPassword" id="loginPasswordLabel">
+            Repassword
+          </Label>
+          <Input
+            onChange={(e) => {
+              setRepassword(e.target.value)
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSignup()
+              }
+            }}
+            style={{
+              padding: '0.4em 1em 0.5em',
+            }}
+            type="password"
+            id="repassword"
+          />
         </InputGroup>
-        <SignUp href="/signup">Sign up</SignUp>
+        <InputGroup className="inputGroup3">
+          <Button onClick={handleSignup}>Sign up</Button>
+        </InputGroup>
+        <Login href="/login">Login</Login>
       </Form>
     </Container>
   )
