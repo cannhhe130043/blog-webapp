@@ -1,10 +1,11 @@
 import React from 'react'
-import axios from 'axios'
 import * as dotenv from 'dotenv'
+import { login, register } from '../services/auth.service'
 dotenv.config()
 
 type AuthContext = {
   onLogin(username: string, password: string): Promise<void>
+  onSignup(username: string, password: string): Promise<void>
   token: string | undefined
 }
 
@@ -22,20 +23,22 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   }, [])
 
   const handleLogin = async (username: string, password: string) => {
-    const response = await axios.post(
-      `${process.env.REACT_APP_API_URL}auth/login`,
-      {
-        username,
-        password,
-      }
-    )
+    const response = await login(username, password)
     const token = response.data
     setToken(token)
-    sessionStorage.setItem('token', token)
+    localStorage.setItem('token', token)
+  }
+
+  const handleSignup = async (username: string, password: string) => {
+    const response = await register(username, password)
+    const token = response.data
+    setToken(token)
+    localStorage.setItem('token', token)
   }
 
   const value: AuthContext = {
     onLogin: handleLogin,
+    onSignup: handleSignup,
     token,
   }
 
