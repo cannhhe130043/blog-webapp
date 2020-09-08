@@ -1,7 +1,7 @@
 import React from 'react'
 import './App.css'
 import { AuthProvider } from './contexts/AuthContext'
-import { Main } from './components/Main'
+import { Main } from './Main'
 import styled from 'styled-components'
 
 const Container = styled.div<{
