@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import styled from 'styled-components'
 import { BigFoot } from '../../components/BigFoot'
 import { useHistory } from 'react-router-dom'
+import { Loading } from '../../components/Loading'
 
 const Container = styled.div`
   width: 100%;
@@ -43,36 +44,6 @@ const Form = styled.div`
   .inputGroup2 #showPasswordToggle input:disabled ~ .indicator:after {
     visibility: hidden;
   }
-`
-
-const SvgContainer = styled.div`
-  position: relative;
-  width: 200px;
-  height: 200px;
-  margin: 0 auto 1em;
-  border-radius: 50%;
-  pointer-events: none;
-  ::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    width: inherit;
-    height: inherit;
-    box-sizing: border-box;
-    border: solid 2.5px #217093;
-    border-radius: 50%;
-  }
-`
-
-const SvgContainerDiv = styled.div`
-  position: relative;
-  width: 100%;
-  height: 0;
-  overflow: hidden;
-  border-radius: 50%;
-  padding-bottom: 100%;
 `
 
 const InputGroup = styled.div`
@@ -220,143 +191,6 @@ const ErrorContent = styled.div`
   margin-bottom: 5%;
 `
 
-const LoadingDiv = styled.div`
-  width: 100vw;
-  height: 100vh;
-  z-index: 99;
-  background-color: transparent;
-  position: absolute;
-`
-
-const Box = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: flex-start;
-  justify-content: center;
-  align-items: center;
-  background-color: transparent;
-  margin-top: 30vh;
-  :before,
-  :after {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  @keyframes rotating {
-    from {
-      transform: rotate(720deg);
-    }
-    to {
-      transform: none;
-    }
-  }
-`
-
-const Cat = styled.div`
-  position: relative;
-  width: 100%;
-  max-width: 20em;
-  overflow: hidden;
-  background-color: transparent;
-  :before {
-    content: '';
-    display: block;
-    padding-bottom: 100%;
-  }
-  :hover {
-    animation-play-state: paused;
-  }
-  :active {
-    animation-play-state: running;
-  }
-`
-
-const CatHead = styled.div<{
-  style: {
-    url: string
-  }
-}>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
-  :before {
-    content: '';
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    background-size: 200%;
-    background-image: url(${(props) => props.style.url});
-    background-repeat: no-repeat;
-    top: 0;
-    right: 0;
-    background-position: 100% 0%;
-    transform-origin: 0% 100%;
-    transform: rotate(90deg);
-  }
-`
-
-const CatTail = styled.div<{
-  style: {
-    url: string
-  }
-}>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
-  animation-delay: 0.2s;
-  :before {
-    content: '';
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    background-size: 200%;
-    background-image: url(${(props) => props.style.url});
-    background-repeat: no-repeat;
-    left: 0;
-    bottom: 0;
-    background-position: 0% 100%;
-    transform-origin: 100% 0%;
-    transform: rotate(-30deg);
-  }
-`
-
-const CatBody = styled.div<{
-  style: {
-    url: string
-  }
-}>`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: rotating 2.79s cubic-bezier(0.65, 0.54, 0.12, 0.93) infinite;
-  content: '';
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  background-size: 200%;
-  background-repeat: no-repeat;
-  animation-delay: 0.1s;
-  :nth-of-type(2) {
-    animation-delay: 0.2s;
-  }
-  :before {
-    right: 0;
-    bottom: 0;
-    background-position: 100% 100%;
-    transform-origin: 0% 0%;
-    background-image: url(${(props) => props.style.url});
-  }
-`
-
 const Login = styled.a`
   color: blue;
   text-decoration: none;
@@ -375,21 +209,6 @@ export const Register: React.FC = () => {
   const [hiddenError, setHiddenError] = React.useState(true)
   const [isShowPassword, setShowPassword] = React.useState(false)
   const { onSignup } = useAuth()
-
-  React.useEffect(() => {
-    const scriptTween = document.createElement('script')
-    scriptTween.src = './js/tweenMax.min.js'
-    scriptTween.async = false
-    document.body.appendChild(scriptTween)
-    const script = document.createElement('script')
-    script.src = './js/scriptRegister.js'
-    script.async = false
-    document.body.appendChild(script)
-    const scriptMorph = document.createElement('script')
-    scriptMorph.src = './js/morphSVGPlugin.min.js'
-    scriptMorph.async = false
-    document.body.appendChild(scriptMorph)
-  }, [])
 
   const handleSignup = async () => {
     if (!username.trim() || !password.trim() || !repassword.trim()) {
@@ -422,33 +241,12 @@ export const Register: React.FC = () => {
 
   return (
     <Container>
-      <LoadingDiv style={{ visibility: loading ? 'visible' : 'hidden' }}>
-        <Box>
-          <Cat>
-            <CatBody
-              style={{ url: `${window.location.origin}/images/loading.png` }}
-            />
-            <CatBody
-              style={{ url: `${window.location.origin}/images/loading.png` }}
-            />
-            <CatHead
-              style={{ url: `${window.location.origin}/images/loading.png` }}
-            />
-            <CatTail
-              style={{ url: `${window.location.origin}/images/loading.png` }}
-            />
-          </Cat>
-        </Box>
-      </LoadingDiv>
+      <Loading loading={loading} />
       <Form style={{ visibility: loading ? 'hidden' : 'visible' }}>
         <ErrorDiv style={{ visibility: hiddenError ? 'hidden' : 'visible' }}>
           <ErrorContent>{error}</ErrorContent>
         </ErrorDiv>
-        <SvgContainer className="svgContainer">
-          <SvgContainerDiv>
-            <BigFoot />
-          </SvgContainerDiv>
-        </SvgContainer>
+        <BigFoot />
         <InputGroup className="inputGroup1">
           <Label htmlFor="loginUsername" id="loginUsernameLabel">
             Username
