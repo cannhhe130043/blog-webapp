@@ -6,6 +6,7 @@ dotenv.config()
 type AuthContext = {
   onLogin(username: string, password: string): Promise<void>
   onSignup(username: string, password: string): Promise<void>
+  onLogout(): void
   token: string | undefined
 }
 
@@ -26,19 +27,25 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
     const response = await login(username, password)
     const token = response.data
     setToken(token)
-    localStorage.setItem('token', token)
+    sessionStorage.setItem('token', token)
   }
 
   const handleSignup = async (username: string, password: string) => {
     const response = await register(username, password)
     const token = response.data
     setToken(token)
-    localStorage.setItem('token', token)
+    sessionStorage.setItem('token', token)
+  }
+
+  const handleLogout = () => {
+    setToken(undefined)
+    sessionStorage.setItem('token', '')
   }
 
   const value: AuthContext = {
     onLogin: handleLogin,
     onSignup: handleSignup,
+    onLogout: handleLogout,
     token,
   }
 
